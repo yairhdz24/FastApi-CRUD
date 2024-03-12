@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FASTAPI CRUD</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+    <link rel="icon" href="/images/Registro.png" type="" />
+  </head>
+  <body>
+    <form class="form" action="/create_person" method="post">
+      <p class="title">Registro</p>
+      <p class="message">Registrate para tener acceso a la App.</p>
+
+      <label>
+        <input
+          required=""
+          placeholder=""
+          type="text"
+          class="input"
+          id="name"
+          name="name" />
+        <span>Nombre</span>
+      </label>
+
+      <label>
+        <input
+          required=""
+          placeholder=""
+          maxlength="2"
+          type="phone"
+          class="input"
+          id="age"
+          name="age" />
+        <span>Edad</span>
+      </label>
+
+      <label>
+        <input
+          required=""
+          placeholder=""
+          maxlength="10"
+          type="phone"
+          class="input"
+          id="tel"
+          name="tel" />
+        <span>Telefono</span>
+      </label>
+
+      <button class="submit" type="submit" value="Create">Registrar</button>
+      <p class="view-people-button" style="text-align: center">
+        <a href="/people">VER REGISTROS</a>
+      </p>
+    </form>
+
+    <!-- Footer -->
+    <footer>
+      <div class="footer-container">
+          <p>&reg; Yair Hernandez Ochoa - Todos los derechos reservados</p>
+        <div class="social-icons">
+          <a href="https://www.facebook.com/profile.php?id=100013151493918"><i class="fab fa-facebook"></i></a>
+          <a href="https://www.instagram.com/yair_hdz24/"
+            ><i class="fab fa-instagram"></i
+          ></a>
+          <a href="https://github.com/yairhdz24"><i class="fab fa-github"></i></a>
+          <a href="https://www.linkedin.com/in/yair-hern%C3%A1ndez-664161164/"><i class="fab fa-linkedin"></i></a>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

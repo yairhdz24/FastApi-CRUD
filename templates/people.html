@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Personas</title>
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Popins&display=swap" />
+    <link rel="stylesheet" href="/static/table.css" />
+    <link rel="stylesheet" href="/static/styles.css">
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+    <link rel="shortcut icon" href="/images/Registro.png" type="image/x-icon" />
+  </head>
+  <body>
+    <button
+      id="backButton"
+      style="
+        padding: 10px;
+        background-color: royalblue;
+        border-radius: 30%;
+        border: none;
+        cursor: pointer;
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        margin-bottom: 20px;
+      "
+      onclick="goBack()">
+      <i class="fas fa-arrow-left" style="font-size: 22px; color: aliceblue;"></i>
+    </button>
+
+    <h1 style="text-align: center;">Personas</h1>
+    <table>
+      <tr>
+        <th>Nombre</th>
+        <th>Edad</th>
+        <th>Teléfono</th>
+        <th>Acciones</th>
+      </tr>
+      {% for person in people %}
+      <tr>
+        <td>{{ person.nombre }}</td>
+        <td>{{ person.edad }}</td>
+        <td>{{ person.telefono }}</td>
+        <td>
+            <button class="edit-button" onclick="editPerson('{{ person.id }}')">
+                Editar
+                <i class="fas fa-edit"  style="font-size: 15px; margin-left: 5px;"></i> 
+            </button>
+            <button class="delete-button" onclick="openConfirmationModal('{{ person.id }}', event)">
+                Eliminar
+                <i class="fas fa-trash-alt" style="font-size: 15px; margin-left: 5px;"></i> <!-- Icono de bote de basura -->
+            </button>
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
+
+    <!-- Modal para editar persona -->
+    <div id="editModal" class="modal" style="display: none">
+      <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h2>Editar Persona</h2>
+        <form id="editForm" action="#" method="post">
+          <label for="editName">Nombre:</label><br />
+          <input type="text" id="editName" name="nombre" /><br />
+          <label for="editAge">Edad:</label><br />
+          <input type="phone" maxlength="2" id="editAge" name="edad" /><br /><br />
+          <label for="editTel">Teléfono:</label><br />
+          <input type="phone" maxlength="10" id="editTel" name="telefono" /><br />
+          <input type="button" value="Guardar" onclick="submitEditForm()" />
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal para confirmación de eliminación -->
+    <div
+      id="confirmationModal"
+      class="confirmation-modal"
+      style="display: none">
+      <div class="confirmation-modal-content">
+        <h2>Confirmación de Eliminación</h2>
+        <p>¿Estás seguro de que deseas eliminar esta persona?</p>
+        <div class="confirmation-modal-buttons">
+          <button class="confirm-button" onclick="deletePerson()">
+            Eliminar
+          </button>
+          <button class="cancel-button" onclick="closeConfirmationModal()">
+            Cancelar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function editPerson(personId) {
+        fetch(`/people/${personId}/details`)
+          .then((response) => response.json())
+          .then((data) => {
+            document.getElementById("editName").value = data.nombre;
+            document.getElementById("editAge").value = data.edad;
+            document.getElementById("editTel").value = data.telefono;
+            // Asignar el ID de la persona al formulario de edición
+            document.getElementById(
+              "editForm"
+            ).action = `/people/${personId}/edit/`;
+            // Abrir el modal de edición
+            document.getElementById("editModal").style.display = "block";
+          })
+          .catch((error) => console.error("Error:", error));
+      }
+
+      function closeModal() {
+        document.getElementById("editModal").style.display = "none";
+      }
+
+      function submitEditForm() {
+        // Obtener los datos del formulario de edición
+        const editName = document.getElementById("editName").value;
+        const editAge = document.getElementById("editAge").value;
+        const editTel = document.getElementById("editTel").value;
+
+        // Crear un objeto JSON con los datos del formulario
+        const requestData = {
+          nombre: editName,
+          edad: editAge,
+          telefono: editTel,
+        };
+
+        // Obtener la URL de la acción del formulario
+        const actionUrl = document.getElementById("editForm").action;
+
+        // Enviar la solicitud POST con los datos del formulario en formato JSON
+        fetch(actionUrl, {
+          method: "POST",
+          body: JSON.stringify(requestData),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            console.log(data);
+            // Cerrar el modal después de guardar los cambios
+            closeModal();
+            // Recargar la página para mostrar los cambios actualizados
+            window.location.reload();
+          })
+          .catch((error) => console.error("Error:", error));
+      }
+
+      function openConfirmationModal(personId, event) {
+        // Mostrar el modal de confirmación de eliminación
+        document.getElementById("confirmationModal").style.display = "block";
+        // Definir una función de eliminación anónima que llama a deletePerson con el ID de la persona
+        document
+          .getElementById("confirmationModal")
+          .querySelector(".confirm-button").onclick = function () {
+          deletePerson(personId);
+        };
+        // Prevenir el comportamiento predeterminado del botón
+        event.preventDefault();
+      }
+
+      function closeConfirmationModal() {
+        // Cerrar el modal de confirmación
+        document.getElementById("confirmationModal").style.display = "none";
+      }
+      function deletePerson(personId) {
+        fetch(`/people/${personId}/delete/`, {
+          method: "POST",
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            console.log(data);
+            // Actualizar la página después de eliminar la persona
+            window.location.reload();
+          })
+          .catch((error) => console.error("Error:", error));
+      }
+
+      // Función para regresar al inicio
+      function goBack() {
+        window.history.back();
+      }
+    </script>
+  </body>
+</html>
